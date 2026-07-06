@@ -152,3 +152,14 @@ Phase 6: Manageable categories + monthly category breakdown
 - Budgets follow the current category list.
 - Added This Month category breakdown bar chart.
 - Built from Phase 5 after checking no PIN/security leftovers.
+
+
+## 3.4.0-phase7-ui-polish
+
+Phase 7: UI declutter + polish
+- Settings page is less crowded by collapsing Manage Categories and Category Budgets into expandable panels.
+- Home hides Monthly Budgets until at least one budget cap is set.
+- Home hides Category Breakdown until this month has spending data.
+- Add page received light spacing polish and a shorter optional note field.
+- No money logic, storage structure, category logic, backup logic, or calculator logic was changed.
+- Built from Phase 6 after checking no PIN/security leftovers.

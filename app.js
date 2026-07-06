@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase6-categories-chart";
+const APP_VERSION = "3.4.0-phase7-ui-polish";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -432,13 +432,16 @@ function saveCategoryBudgets() {
 
 function renderBudgetProgress() {
   const container = $("#budgetProgressList");
+  const panel = $("#budgetPanel");
   if (!container) return;
   const budgets = settings.categoryBudgets || {};
   const activeKeys = categoryKeys().filter(key => Number(budgets[key] || 0) > 0);
   if (!activeKeys.length) {
+    if (panel) panel.classList.add("hidden");
     container.innerHTML = `<div class="empty-state">${tr("noBudgetsSet")}</div>`;
     return;
   }
+  if (panel) panel.classList.remove("hidden");
 
   const spending = monthlySpendingByCategory();
   container.innerHTML = activeKeys.map(key => {
@@ -572,12 +575,15 @@ function categoryChartData() {
 
 function renderCategoryChart() {
   const container = $("#categoryChartList");
+  const panel = $("#categoryChartPanel");
   if (!container) return;
   const data = categoryChartData();
   if (!data.length) {
+    if (panel) panel.classList.add("hidden");
     container.innerHTML = `<div class="empty-state">${tr("noCategorySpending")}</div>`;
     return;
   }
+  if (panel) panel.classList.remove("hidden");
   const max = Math.max(...data.map(item => item.amount), 1);
   container.innerHTML = data.map(item => {
     const percent = Math.max(4, Math.round((item.amount / max) * 100));
@@ -1753,7 +1759,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase6-categories-chart").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase7-ui-polish").then(reg => reg.update()).catch(() => {});
   }
 }
 

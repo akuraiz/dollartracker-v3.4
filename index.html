@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4.0-phase6-categories-chart" />
+  <link rel="stylesheet" href="styles.css?v=3.4.0-phase7-ui-polish" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -104,7 +104,7 @@
           <p class="hint monthly-category" id="monthlyTopCategory">Top category: None</p>
         </section>
 
-        <section class="panel glass budget-panel">
+        <section class="panel glass budget-panel optional-home-panel" id="budgetPanel">
           <div class="panel-head">
             <div>
               <h3 id="monthlyBudgetsTitle">Monthly Budgets</h3>
@@ -114,7 +114,7 @@
           <div class="budget-list" id="budgetProgressList"></div>
         </section>
 
-        <section class="panel glass category-chart-panel">
+        <section class="panel glass category-chart-panel optional-home-panel" id="categoryChartPanel">
           <div class="panel-head">
             <div>
               <h3 id="categoryChartTitle">Category Breakdown</h3>
@@ -165,7 +165,7 @@
             <label><span id="whatForLabel">Description</span><input id="descriptionInput" type="text" placeholder="Food, AC transfer, coffee..." autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" /></label>
             <div class="quick-desc-chips" id="quickDescChips"></div>
             <label><span id="dateLabel">Date</span><input id="dateInput" type="date" required /></label>
-            <label><span id="noteLabel">Note</span><textarea id="noteInput" rows="3" placeholder="Optional note" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false"></textarea></label>
+            <label><span id="noteLabel">Note</span><textarea id="noteInput" rows="2" placeholder="Optional note" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false"></textarea></label>
             <button class="primary-button full" type="submit" id="saveRecordBtn">Save Record</button>
           </form>
         </section>
@@ -251,30 +251,45 @@
           <button class="secondary-button full" type="button" id="saveSettingsBtn">Save Settings</button>
         </section>
 
-        <section class="panel glass category-manager-panel">
-          <div class="section-title">
-            <h3 id="categoryManagerTitle">Manage Categories</h3>
-            <p class="hint" id="categoryManagerHint">Add, rename, remove, or reset categories.</p>
-          </div>
+        <section class="panel glass category-manager-panel settings-collapse-panel">
+          <details class="settings-collapse">
+            <summary>
+              <div class="section-title">
+                <h3 id="categoryManagerTitle">Manage Categories</h3>
+                <p class="hint" id="categoryManagerHint">Add, rename, remove, or reset categories.</p>
+              </div>
+              <span class="collapse-arrow" aria-hidden="true">⌄</span>
+            </summary>
 
-          <div class="category-add-row">
-            <input id="newCategoryInput" type="text" maxlength="28" placeholder="New category name" autocomplete="off" />
-            <button class="secondary-button compact-button" type="button" id="addCategoryBtn">Add</button>
-          </div>
+            <div class="settings-collapse-body">
+              <div class="category-add-row">
+                <input id="newCategoryInput" type="text" maxlength="28" placeholder="New category name" autocomplete="off" />
+                <button class="secondary-button compact-button" type="button" id="addCategoryBtn">Add</button>
+              </div>
 
-          <div class="category-manager-list" id="categoryManagerList"></div>
+              <div class="category-manager-list" id="categoryManagerList"></div>
 
-          <button class="secondary-button full compact-button" type="button" id="resetCategoriesBtn">Reset to Default</button>
+              <button class="secondary-button full compact-button" type="button" id="resetCategoriesBtn">Reset to Default</button>
+            </div>
+          </details>
         </section>
 
-        <section class="panel glass">
-          <div class="section-title">
-            <h3 id="categoryBudgetsTitle">Category Budgets</h3>
-            <p class="hint" id="categoryBudgetsHint">Monthly caps per category. Stored internally in USD.</p>
-          </div>
-          <p class="hint budget-currency-note" id="budgetCurrencyNote">Shown in current display currency.</p>
-          <div class="budget-input-list" id="budgetInputList"></div>
-          <button class="secondary-button full" type="button" id="saveBudgetsBtn">Save Budgets</button>
+        <section class="panel glass settings-collapse-panel">
+          <details class="settings-collapse">
+            <summary>
+              <div class="section-title">
+                <h3 id="categoryBudgetsTitle">Category Budgets</h3>
+                <p class="hint" id="categoryBudgetsHint">Monthly caps per category. Stored internally in USD.</p>
+              </div>
+              <span class="collapse-arrow" aria-hidden="true">⌄</span>
+            </summary>
+
+            <div class="settings-collapse-body">
+              <p class="hint budget-currency-note" id="budgetCurrencyNote">Shown in current display currency.</p>
+              <div class="budget-input-list" id="budgetInputList"></div>
+              <button class="secondary-button full" type="button" id="saveBudgetsBtn">Save Budgets</button>
+            </div>
+          </details>
         </section>
 
         <section class="panel glass danger-panel">
@@ -458,6 +473,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.4.0-phase6-categories-chart"></script>
+  <script src="app.js?v=3.4.0-phase7-ui-polish"></script>
 </body>
 </html>

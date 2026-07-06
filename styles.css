@@ -628,3 +628,97 @@ body.modal-open {
 }
 
 .category-chart-panel { overflow: hidden; }
+
+
+/* v3.4 Phase 7: UI declutter + polish */
+.settings-collapse-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.settings-collapse {
+  display: block;
+}
+
+.settings-collapse summary {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  padding: 18px;
+}
+
+.settings-collapse summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-collapse .section-title {
+  margin: 0;
+}
+
+.collapse-arrow {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: rgba(255,255,255,.08);
+  transition: transform .2s ease;
+}
+
+.settings-collapse[open] .collapse-arrow {
+  transform: rotate(180deg);
+}
+
+.settings-collapse-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+
+.optional-home-panel.hidden {
+  display: none !important;
+}
+
+#page-add .panel:first-child {
+  padding-bottom: 16px;
+}
+
+#page-add .form {
+  gap: 12px;
+}
+
+#page-add textarea {
+  min-height: 86px;
+}
+
+#page-add .mini-help {
+  padding: 12px 14px;
+  border-radius: 20px;
+}
+
+#page-add .mini-help h3 {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+#page-add .mini-help p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 370px) {
+  .settings-collapse summary {
+    padding: 16px;
+  }
+
+  .settings-collapse-body {
+    padding: 0 16px 16px;
+  }
+}
