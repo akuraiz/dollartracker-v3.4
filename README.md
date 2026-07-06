@@ -108,3 +108,13 @@ Phase 2: Cleaner History page
 - From date, To date, Sort, Clear Filters moved into a bottom sheet.
 - Added Filter button with active state when advanced filters are applied.
 - Confirmed no old PIN/security logic was present before building.
+
+
+## 3.4.0-phase3-performance
+
+Phase 3: Performance cleanup
+- Debounced History search rendering only.
+- Amount, date, sort, transaction, and settings inputs still update immediately.
+- `translateUI()` no longer runs inside every normal render.
+- Translations still run on boot, page change, and language change.
+- Built from the clean Phase 2 History Filter version after checking no PIN/security leftovers.

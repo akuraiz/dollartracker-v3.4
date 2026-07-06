@@ -1,4 +1,4 @@
-const CACHE_NAME = "dollartracker-local-v16-phase2-history-filter";
+const CACHE_NAME = "dollartracker-local-v17-phase3-performance";
 const ASSETS = [
   "./",
   "./index.html",

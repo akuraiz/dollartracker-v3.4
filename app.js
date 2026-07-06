@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase2-history-filter";
+const APP_VERSION = "3.4.0-phase3-performance";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -549,6 +549,19 @@ function setText(id, value, html = false) {
   else el.textContent = value;
 }
 
+function debounce(fn, delay = 180) {
+  let timer = 0;
+  return (...args) => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => fn(...args), delay);
+  };
+}
+
+const debouncedHistorySearchRender = debounce(() => {
+  saveState();
+  render();
+}, 180);
+
 function translateUI() {
   const activeKey = $(".page.active")?.dataset.titleKey || "home";
   setText("pageTitle", tr(activeKey));
@@ -671,9 +684,10 @@ function renderSummary() {
   $("#summaryOutBar").style.width = `${Math.round((summary.totalOutUSD / max) * 100)}%`;
 }
 
-function render() {
+function render(options = {}) {
+  const shouldTranslate = Boolean(options.translate);
   applyDocumentSettings();
-  translateUI();
+  if (shouldTranslate) translateUI();
   renderLanguageButton();
 
   const total = totals(records);
@@ -1232,7 +1246,7 @@ function initEvents() {
     settings.language = settings.language === "km" ? "en" : "km";
     saveSettings();
     saveState();
-    render();
+    render({ translate: true });
     showToast(settings.language === "km" ? tr("changedToKhmer") : tr("changedToEnglish"));
   });
 
@@ -1255,7 +1269,10 @@ function initEvents() {
     render();
   }));
 
-  $("#searchInput").addEventListener("input", event => { searchTerm = event.target.value; saveState(); render(); });
+  $("#searchInput").addEventListener("input", event => {
+    searchTerm = event.target.value;
+    debouncedHistorySearchRender();
+  });
   $("#fromDateInput").addEventListener("change", event => { fromDate = event.target.value; saveState(); render(); });
   $("#toDateInput").addEventListener("change", event => { toDate = event.target.value; saveState(); render(); });
   $("#sortSelect").addEventListener("change", event => { sortMode = event.target.value; saveState(); render(); });
@@ -1349,7 +1366,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase2-history-filter").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase3-performance").then(reg => reg.update()).catch(() => {});
   }
 }
 
@@ -1363,7 +1380,7 @@ function boot() {
     setPage(state.activePage);
   }
 
-  render();
+  render({ translate: true });
   registerServiceWorker();
   console.log(`DollarTracker ${APP_VERSION} loaded`, { records: records.length, settings });
 }
