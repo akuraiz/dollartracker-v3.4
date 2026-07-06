@@ -118,3 +118,14 @@ Phase 3: Performance cleanup
 - `translateUI()` no longer runs inside every normal render.
 - Translations still run on boot, page change, and language change.
 - Built from the clean Phase 2 History Filter version after checking no PIN/security leftovers.
+
+
+## 3.4.0-phase4-backup-calc-polish
+
+Phase 4: Backup reminder + calculator polish
+- Adds a non-blocking backup reminder banner on Home.
+- Reminder appears when records exist and no backup exists, or last backup is 7+ days old.
+- Dismiss hides the reminder for the day.
+- Export Backup from the banner updates the backup date and hides the reminder.
+- Calculator backspace key now uses an iOS-style delete/backspace SVG icon in the requested slot.
+- Built from Phase 3 after checking no PIN/security leftovers.

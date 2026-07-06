@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase3-performance";
+const APP_VERSION = "3.4.0-phase4-backup-calc-polish";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -25,7 +25,8 @@ const defaultSettings = {
   themeTemplate: "mono",
   displayCurrency: "USD",
   exchangeRate: 4000,
-  lastBackupAt: ""
+  lastBackupAt: "",
+  backupReminderDismissedAt: ""
 };
 
 const currencyPresets = {
@@ -47,6 +48,7 @@ const I18N = {
     allRecords:"All Records", historyHint:"Search, filter, and review your records.", summary:"Summary", all:"All", searchRecords:"Search records...",
     fromDate:"From", toDate:"To", newest:"Newest first", oldest:"Oldest first", highest:"Highest amount", lowest:"Lowest amount", clearFilters:"Clear Filters", filter:"Filter", filterRecords:"Filter Records", filterHint:"Narrow records by date or sorting.", sortBy:"Sort by", applyFilters:"Apply Filters",
     backupExport:"Backup & Export", backupHint:"Your records stay in this browser. Export backup regularly.", lastBackup:"Last backup", never:"Never",
+    backupReminderTitle:"Backup Reminder", backupReminderText:"It has been a while since your last backup. Export one now so your records stay safe.", backupReminderNeverText:"You have records but no backup yet. Export one now so you can restore later.", dismiss:"Dismiss",
     exportBackup:"Export Backup JSON", exportCsv:"Export CSV", importBackup:"Import Backup JSON", safetyHabit:"Safety habit",
     safetyHint:"After adding records, export a backup and save it to iCloud Drive or Google Drive.", appearance:"Appearance", displayMode:"Display Mode",
     dark:"Dark", light:"Light", themeTemplate:"Theme Template", monoTheme:"Mono Glass", pinkTheme:"Pink Glass", moneySettings:"Money Settings",
@@ -75,7 +77,8 @@ const I18N = {
     searchRecords:"ស្វែងរកកំណត់ត្រា...", fromDate:"ពីថ្ងៃ", toDate:"ដល់ថ្ងៃ", newest:"ថ្មីបំផុត", oldest:"ចាស់បំផុត",
     highest:"ចំនួនច្រើនបំផុត", lowest:"ចំនួនតិចបំផុត", clearFilters:"លុបតម្រង", filter:"តម្រង", filterRecords:"តម្រងកំណត់ត្រា", filterHint:"កំណត់តាមកាលបរិច្ឆេទ ឬការតម្រៀប។", sortBy:"តម្រៀបតាម", applyFilters:"អនុវត្តតម្រង", backupExport:"បម្រុងទុក និងនាំចេញ",
     backupHint:"កំណត់ត្រាត្រូវបានរក្សាទុកក្នុង Browser នេះ។ សូមនាំចេញ Backup ជាប្រចាំ។", lastBackup:"បម្រុងទុកចុងក្រោយ",
-    never:"មិនទាន់មាន", exportBackup:"នាំចេញ Backup JSON", exportCsv:"នាំចេញ CSV", importBackup:"នាំចូល Backup JSON",
+    never:"មិនទាន់មាន", backupReminderTitle:"រំលឹក Backup", backupReminderText:"បានយូរហើយតាំងពី Backup ចុងក្រោយ។ សូមនាំចេញ Backup ដើម្បីរក្សាកំណត់ត្រាឱ្យមានសុវត្ថិភាព។", backupReminderNeverText:"អ្នកមានកំណត់ត្រា ប៉ុន្តែមិនទាន់មាន Backup ទេ។ សូមនាំចេញ Backup ដើម្បីអាចស្ដារវិញពេលក្រោយ។", dismiss:"បិទ",
+    exportBackup:"នាំចេញ Backup JSON", exportCsv:"នាំចេញ CSV", importBackup:"នាំចូល Backup JSON",
     safetyHabit:"ទម្លាប់សុវត្ថិភាព", safetyHint:"បន្ទាប់ពីបញ្ចូលកំណត់ត្រា សូមនាំចេញ Backup ហើយរក្សាទុកក្នុង iCloud Drive ឬ Google Drive។",
     appearance:"រូបរាង", displayMode:"របៀបបង្ហាញ", dark:"ងងឹត", light:"ភ្លឺ", themeTemplate:"គំរូពណ៌", monoTheme:"Mono Glass",
     pinkTheme:"Pink Glass", moneySettings:"ការកំណត់ទឹកប្រាក់", exchangeRate:"អត្រាប្តូរប្រាក់", exchangeRateHint:"លំនាំដើម៖ 1 USD = 4000៛",
@@ -577,6 +580,7 @@ function translateUI() {
   setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("openFilterText", tr("filter")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("historyFilterTitle", tr("filterRecords")); setText("historyFilterHint", tr("filterHint")); setText("closeHistoryFilterBtn", tr("close")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("sortByLabel", tr("sortBy")); setText("clearFiltersBtn", tr("clearFilters")); setText("applyHistoryFilterBtn", tr("applyFilters"));
   $("#searchInput").placeholder = tr("searchRecords");
   const sort = $("#sortSelect"); if (sort) { sort.options[0].text = tr("newest"); sort.options[1].text = tr("oldest"); sort.options[2].text = tr("highest"); sort.options[3].text = tr("lowest"); }
+  setText("backupReminderTitle", tr("backupReminderTitle")); setText("backupReminderExportBtn", tr("exportBackup")); setText("backupReminderDismissBtn", tr("dismiss"));
   setText("backupExportTitle", tr("backupExport")); setText("backupHintText", tr("backupHint")); setText("lastBackupLabel", tr("lastBackup")); setText("exportBackupBtn", tr("exportBackup")); setText("exportCsvBtn", tr("exportCsv")); setText("importBackupText", tr("importBackup")); setText("safetyHabitTitle", tr("safetyHabit")); setText("safetyHintText", tr("safetyHint"));
   setText("appearanceTitle", tr("appearance")); setText("displayModeLabel", tr("displayMode")); setText("darkLabel", tr("dark")); setText("lightLabel", tr("light")); setText("themeTemplateLabel", tr("themeTemplate")); setText("monoThemeText", tr("monoTheme")); setText("pinkThemeText", tr("pinkTheme"));
   setText("moneySettingsTitle", tr("moneySettings")); setText("exchangeRateTitle", tr("exchangeRate")); setText("exchangeRateHint", tr("exchangeRateHint")); setText("appNameTitle", tr("appName")); setText("appNameHint", tr("appNameHint")); setText("saveSettingsBtn", tr("saveSettings"));
@@ -725,6 +729,7 @@ function render(options = {}) {
   renderAmountChips();
   renderRecordList($("#recentList"), sortedRecords(records).slice(0, 4), true);
   renderRecordList($("#historyList"), filteredRecords(), false);
+  renderBackupReminder();
   renderSummary();
   window.requestAnimationFrame(updateNavPill);
 }
@@ -936,10 +941,43 @@ function useCalculatorAmount() {
   closeCalculator();
 }
 
+
+function daysSinceISO(iso) {
+  if (!iso) return Infinity;
+  const time = new Date(iso).getTime();
+  if (!Number.isFinite(time)) return Infinity;
+  return Math.floor((Date.now() - time) / 86400000);
+}
+
+function backupReminderDue() {
+  if (!records.length) return false;
+  const dismissedToday = settings.backupReminderDismissedAt === todayISO();
+  if (dismissedToday) return false;
+  if (!settings.lastBackupAt) return true;
+  return daysSinceISO(settings.lastBackupAt) >= 7;
+}
+
+function renderBackupReminder() {
+  const banner = $("#backupReminder");
+  if (!banner) return;
+  const due = backupReminderDue();
+  banner.classList.toggle("hidden", !due);
+  if (!due) return;
+  const textKey = settings.lastBackupAt ? "backupReminderText" : "backupReminderNeverText";
+  setText("backupReminderText", tr(textKey));
+}
+
+function dismissBackupReminder() {
+  settings.backupReminderDismissedAt = todayISO();
+  saveSettings();
+  render();
+}
+
 function exportBackup() {
   const data = { app: "DollarTracker", version: APP_VERSION, exportedAt: new Date().toISOString(), settings, records };
   downloadFile(`dollartracker-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), "application/json");
   settings.lastBackupAt = new Date().toISOString();
+  settings.backupReminderDismissedAt = "";
   saveSettings();
   render();
   showToast(tr("backupExported"));
@@ -1342,6 +1380,8 @@ function initEvents() {
   $("#editCurrencyInput").addEventListener("change", updateEditAmountInputMode);
 
   $("#copyBalanceBtn").addEventListener("click", copyBalance);
+  $("#backupReminderExportBtn").addEventListener("click", exportBackup);
+  $("#backupReminderDismissBtn").addEventListener("click", dismissBackupReminder);
   $("#exportBackupBtn").addEventListener("click", exportBackup);
   $("#exportCsvBtn").addEventListener("click", exportCSV);
   $("#importBackupInput").addEventListener("change", event => importBackup(event.target.files[0]));
@@ -1366,7 +1406,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase3-performance").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase4-backup-calc-polish").then(reg => reg.update()).catch(() => {});
   }
 }
 

@@ -378,3 +378,51 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* v3.4 Phase 4: backup reminder + calculator polish */
+.backup-reminder {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0;
+  padding: 16px;
+  border-radius: 26px;
+  border: 1px solid var(--line);
+}
+
+.backup-reminder h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  letter-spacing: -.035em;
+}
+
+.backup-reminder .hint {
+  margin: 0;
+}
+
+.backup-reminder-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.calc-icon-key svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 370px) {
+  .backup-reminder-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .backup-reminder-actions .ghost-button {
+    min-height: 46px;
+  }
+}

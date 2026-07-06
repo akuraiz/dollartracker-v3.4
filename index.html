@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4.0-phase3-performance" />
+  <link rel="stylesheet" href="styles.css?v=3.4.0-phase4-backup-calc-polish" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -56,6 +56,17 @@
             <button type="button" class="mini-link" id="copyBalanceBtn">Copy</button>
           </div>
           <p class="rate-note" id="rateNote">1 USD = 4000៛</p>
+        </section>
+
+        <section class="backup-reminder glass hidden" id="backupReminder">
+          <div>
+            <h3 id="backupReminderTitle">Backup Reminder</h3>
+            <p class="hint" id="backupReminderText">It has been a while since your last backup. Export one now so your records stay safe.</p>
+          </div>
+          <div class="backup-reminder-actions">
+            <button class="primary-button compact-button" type="button" id="backupReminderExportBtn">Export Backup JSON</button>
+            <button class="ghost-button" type="button" id="backupReminderDismissBtn">Dismiss</button>
+          </div>
         </section>
 
         <section class="quick-actions">
@@ -370,7 +381,13 @@
         <div class="calc-display" id="calcDisplay">0</div>
         <div class="calc-grid">
           <button type="button" data-calc-clear="true">C</button>
-          <button type="button" data-calc-back="true">←</button>
+          <button type="button" class="calc-icon-key" data-calc-back="true" aria-label="Delete last digit">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 5.5v13a2 2 0 0 1-2 2H9.4a2 2 0 0 1-1.5-.68L2.8 14a3 3 0 0 1 0-4l5.1-5.82a2 2 0 0 1 1.5-.68H19a2 2 0 0 1 2 2Z"></path>
+              <path d="M10.7 9.2l4.6 4.6"></path>
+              <path d="M15.3 9.2l-4.6 4.6"></path>
+            </svg>
+          </button>
           <button type="button" data-calc-op="÷">÷</button>
           <button type="button" data-calc-op="×">×</button>
           <button type="button" data-calc-num="7">7</button>
@@ -394,6 +411,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.4.0-phase3-performance"></script>
+  <script src="app.js?v=3.4.0-phase4-backup-calc-polish"></script>
 </body>
 </html>
