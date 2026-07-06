@@ -129,3 +129,14 @@ Phase 4: Backup reminder + calculator polish
 - Export Backup from the banner updates the backup date and hides the reminder.
 - Calculator backspace key now uses an iOS-style delete/backspace SVG icon in the requested slot.
 - Built from Phase 3 after checking no PIN/security leftovers.
+
+
+## 3.4.0-phase5-budget-caps
+
+Phase 5: Category budget caps
+- Adds monthly budget caps for Food, Transfer, Shopping, Transport, Savings, and Other.
+- Budgets are stored internally in USD in `settings.categoryBudgets`.
+- Budget inputs display in the current USD/KHR mode.
+- KHR budget inputs use whole Riel display.
+- Home shows monthly budget progress using this month's Out records.
+- Built from Phase 4 after checking no PIN/security leftovers.

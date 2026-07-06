@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase4-backup-calc-polish";
+const APP_VERSION = "3.4.0-phase5-budget-caps";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -26,7 +26,8 @@ const defaultSettings = {
   displayCurrency: "USD",
   exchangeRate: 4000,
   lastBackupAt: "",
-  backupReminderDismissedAt: ""
+  backupReminderDismissedAt: "",
+  categoryBudgets: {}
 };
 
 const currencyPresets = {
@@ -62,7 +63,8 @@ const I18N = {
     importConfirm:"Import backup? This will replace current records in this browser.", importError:"Could not import backup. Make sure it is the correct JSON file.",
     addedFallback:"Amount added", usedFallback:"Amount used", changedToEnglish:"Changed to English", changedToKhmer:"Changed to Khmer",
     edit:"Edit", editRecord:"Edit Record",
-    editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
+    editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None",
+    monthlyBudgets:"Monthly Budgets", monthlyBudgetsHint:"Track spending caps for this month.", categoryBudgets:"Category Budgets", categoryBudgetsHint:"Monthly caps per category. Stored internally in USD.", budgetCurrencyNote:"Shown in current display currency.", saveBudgets:"Save Budgets", budgetsSaved:"Budgets saved", noBudgetsSet:"No budgets set yet. Add caps in Settings.", budgetSpentLine:"{spent} of {budget}", budgetInputHint:"Leave 0 for no cap.", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
   },
   km: {
     eyebrow:"បញ្ជីទឹកប្រាក់ឯកជន", home:"ទំព័រដើម", add:"បញ្ចូល", addRecord:"បញ្ចូលកំណត់ត្រា", history:"ប្រវត្តិ", backup:"បម្រុងទុក", settings:"ការកំណត់",
@@ -157,7 +159,15 @@ function sanitizeSettings(input = {}) {
   if (!["dark", "light"].includes(merged.theme)) merged.theme = "dark";
   if (!["mono", "pink"].includes(merged.themeTemplate)) merged.themeTemplate = "mono";
   if (!merged.appName || merged.appName === "Wifey Money") merged.appName = "DollarTracker";
-return merged;
+
+  const rawBudgets = merged.categoryBudgets && typeof merged.categoryBudgets === "object" ? merged.categoryBudgets : {};
+  merged.categoryBudgets = {};
+  CATEGORY_KEYS.forEach(key => {
+    const value = Number(rawBudgets[key] || 0);
+    merged.categoryBudgets[key] = Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : 0;
+  });
+
+  return merged;
 }
 
 function currencyInfo(currency = settings.displayCurrency) {
@@ -267,6 +277,97 @@ function renderQuickDescriptionChips() {
 function currentMonthRecords() {
   const month = new Date().toISOString().slice(0, 7);
   return records.filter(record => (record.date || "").slice(0, 7) === month);
+}
+
+
+function budgetForCategoryUSD(category) {
+  const key = CATEGORY_KEYS.includes(category) ? category : "other";
+  return Number(settings.categoryBudgets?.[key] || 0);
+}
+
+function monthlySpendingByCategory() {
+  const spending = {};
+  CATEGORY_KEYS.forEach(key => { spending[key] = 0; });
+  currentMonthRecords().filter(record => record.type === "Out").forEach(record => {
+    const key = CATEGORY_KEYS.includes(record.category) ? record.category : "other";
+    spending[key] += Number(record.amountUSD || 0);
+  });
+  return spending;
+}
+
+function budgetDisplayInputValue(amountUSD) {
+  if (!amountUSD) return "";
+  const display = usdToDisplay(amountUSD, settings.displayCurrency);
+  return settings.displayCurrency === "KHR" ? String(Math.round(display)) : String(Math.round(display * 100) / 100);
+}
+
+function renderBudgetSettings() {
+  const container = $("#budgetInputList");
+  if (!container) return;
+  const info = currencyInfo(settings.displayCurrency);
+  container.innerHTML = CATEGORY_KEYS.map(key => {
+    const value = budgetDisplayInputValue(budgetForCategoryUSD(key));
+    return `
+      <label class="budget-input-row">
+        <div>
+          <strong>${escapeHTML(categoryLabel(key))}</strong>
+          <small>${tr("budgetInputHint")}</small>
+        </div>
+        <input type="number" inputmode="${settings.displayCurrency === "KHR" ? "numeric" : "decimal"}" min="0" step="${info.step}" placeholder="0" value="${escapeHTML(value)}" data-budget-input="${key}" />
+      </label>
+    `;
+  }).join("");
+}
+
+function saveCategoryBudgets() {
+  const next = {};
+  $$("[data-budget-input]").forEach(input => {
+    const key = input.dataset.budgetInput;
+    let value = Number(input.value || 0);
+    if (!Number.isFinite(value) || value <= 0) {
+      next[key] = 0;
+      return;
+    }
+    if (settings.displayCurrency === "KHR") value = Math.round(value);
+    next[key] = Math.round(displayToUsd(value, settings.displayCurrency) * 100) / 100;
+  });
+  settings.categoryBudgets = next;
+  saveSettings();
+  saveState();
+  render();
+  showToast(tr("budgetsSaved"));
+}
+
+function renderBudgetProgress() {
+  const container = $("#budgetProgressList");
+  if (!container) return;
+  const budgets = settings.categoryBudgets || {};
+  const activeKeys = CATEGORY_KEYS.filter(key => Number(budgets[key] || 0) > 0);
+  if (!activeKeys.length) {
+    container.innerHTML = `<div class="empty-state">${tr("noBudgetsSet")}</div>`;
+    return;
+  }
+
+  const spending = monthlySpendingByCategory();
+  container.innerHTML = activeKeys.map(key => {
+    const spent = Number(spending[key] || 0);
+    const budget = Number(budgets[key] || 0);
+    const percent = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : 0;
+    const over = spent > budget;
+    const line = tr("budgetSpentLine", {
+      spent: formatMoneyFromUSD(spent),
+      budget: formatMoneyFromUSD(budget)
+    });
+    return `
+      <article class="budget-progress-card ${over ? "over-budget" : ""}">
+        <div class="budget-progress-head">
+          <strong>${escapeHTML(categoryLabel(key))}</strong>
+          <span>${line}</span>
+        </div>
+        <div class="budget-bar-track"><i class="budget-bar-fill" style="width:${percent}%"></i></div>
+      </article>
+    `;
+  }).join("");
 }
 
 function topCategoryFor(list) {
@@ -573,7 +674,7 @@ function translateUI() {
   setText("localOnlyText", tr("localOnly")); setText("balanceLeftLabel", tr("balanceLeft")); setText("copyBalanceBtn", tr("copy"));
   setText("addOutText", tr("addOut")); setText("addInText", tr("addIn")); setText("moneyUsedText", tr("moneyUsed")); setText("moneyAddedText", tr("moneyAdded"));
   setText("totalInLabel", tr("totalIn")); setText("totalOutLabel", tr("totalOut")); setText("amountUsedLabel", tr("amountUsed"));
-  setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance"));
+  setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance")); setText("monthlyBudgetsTitle", tr("monthlyBudgets")); setText("monthlyBudgetsHint", tr("monthlyBudgetsHint"));
   setText("recentTitle", tr("recent")); setText("latestMovementText", tr("latestMovement")); setText("viewAllBtn", tr("viewAll"));
   setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
   $("#descriptionInput").placeholder = tr("whatForPlaceholder"); $("#noteInput").placeholder = tr("optionalNote");
@@ -584,6 +685,7 @@ function translateUI() {
   setText("backupExportTitle", tr("backupExport")); setText("backupHintText", tr("backupHint")); setText("lastBackupLabel", tr("lastBackup")); setText("exportBackupBtn", tr("exportBackup")); setText("exportCsvBtn", tr("exportCsv")); setText("importBackupText", tr("importBackup")); setText("safetyHabitTitle", tr("safetyHabit")); setText("safetyHintText", tr("safetyHint"));
   setText("appearanceTitle", tr("appearance")); setText("displayModeLabel", tr("displayMode")); setText("darkLabel", tr("dark")); setText("lightLabel", tr("light")); setText("themeTemplateLabel", tr("themeTemplate")); setText("monoThemeText", tr("monoTheme")); setText("pinkThemeText", tr("pinkTheme"));
   setText("moneySettingsTitle", tr("moneySettings")); setText("exchangeRateTitle", tr("exchangeRate")); setText("exchangeRateHint", tr("exchangeRateHint")); setText("appNameTitle", tr("appName")); setText("appNameHint", tr("appNameHint")); setText("saveSettingsBtn", tr("saveSettings"));
+  setText("categoryBudgetsTitle", tr("categoryBudgets")); setText("categoryBudgetsHint", tr("categoryBudgetsHint")); setText("budgetCurrencyNote", tr("budgetCurrencyNote")); setText("saveBudgetsBtn", tr("saveBudgets"));
   setText("dangerZoneTitle", tr("dangerZone")); setText("dangerHintText", tr("dangerHint")); setText("clearDataBtn", Date.now() < clearArmedUntil ? tr("tapAgainClear") : tr("clearAll"));
   setText("editTitle", tr("editRecord")); setText("editHint", tr("editHint")); setText("closeEditBtn", tr("close"));
   setText("editTypeLabel", tr("type")); setText("editOutLabel", tr("out")); setText("editInLabel", tr("in"));
@@ -727,6 +829,8 @@ function render(options = {}) {
   $$(".chip").forEach(button => button.classList.toggle("active", button.dataset.filter === activeFilter));
 
   renderAmountChips();
+  renderBudgetSettings();
+  renderBudgetProgress();
   renderRecordList($("#recentList"), sortedRecords(records).slice(0, 4), true);
   renderRecordList($("#historyList"), filteredRecords(), false);
   renderBackupReminder();
@@ -1394,6 +1498,7 @@ function initEvents() {
     render();
     showToast(tr("settingsSaved"));
   });
+  $("#saveBudgetsBtn").addEventListener("click", saveCategoryBudgets);
   $("#clearDataBtn").addEventListener("click", clearEverything);
 
   window.addEventListener("pagehide", persistAll);
@@ -1406,7 +1511,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase4-backup-calc-polish").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase5-budget-caps").then(reg => reg.update()).catch(() => {});
   }
 }
 

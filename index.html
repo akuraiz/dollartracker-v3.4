@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4.0-phase4-backup-calc-polish" />
+  <link rel="stylesheet" href="styles.css?v=3.4.0-phase5-budget-caps" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -102,6 +102,16 @@
             <article><span id="monthlyBalanceLabel">Balance</span><strong id="monthlyBalance">$0.00</strong></article>
           </div>
           <p class="hint monthly-category" id="monthlyTopCategory">Top category: None</p>
+        </section>
+
+        <section class="panel glass budget-panel">
+          <div class="panel-head">
+            <div>
+              <h3 id="monthlyBudgetsTitle">Monthly Budgets</h3>
+              <p class="hint" id="monthlyBudgetsHint">Track spending caps for this month.</p>
+            </div>
+          </div>
+          <div class="budget-list" id="budgetProgressList"></div>
         </section>
 
         <section class="panel glass">
@@ -230,7 +240,18 @@
           </label>
           <button class="secondary-button full" type="button" id="saveSettingsBtn">Save Settings</button>
         </section>
-<section class="panel glass danger-panel">
+
+        <section class="panel glass">
+          <div class="section-title">
+            <h3 id="categoryBudgetsTitle">Category Budgets</h3>
+            <p class="hint" id="categoryBudgetsHint">Monthly caps per category. Stored internally in USD.</p>
+          </div>
+          <p class="hint budget-currency-note" id="budgetCurrencyNote">Shown in current display currency.</p>
+          <div class="budget-input-list" id="budgetInputList"></div>
+          <button class="secondary-button full" type="button" id="saveBudgetsBtn">Save Budgets</button>
+        </section>
+
+        <section class="panel glass danger-panel">
           <h3 id="dangerZoneTitle">Danger Zone</h3>
           <p class="hint" id="dangerHintText">Tap twice to clear all records.</p>
           <button class="danger-button full" type="button" id="clearDataBtn">Clear All Records</button>
@@ -411,6 +432,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.4.0-phase4-backup-calc-polish"></script>
+  <script src="app.js?v=3.4.0-phase5-budget-caps"></script>
 </body>
 </html>

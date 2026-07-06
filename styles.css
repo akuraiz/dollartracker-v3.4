@@ -426,3 +426,108 @@ body.modal-open {
     min-height: 46px;
   }
 }
+
+
+/* v3.4 Phase 5: category budget caps */
+.budget-panel {
+  overflow: hidden;
+}
+
+.budget-list,
+.budget-input-list {
+  display: grid;
+  gap: 10px;
+}
+
+.budget-progress-card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.07);
+  padding: 13px;
+}
+
+.budget-progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.budget-progress-head strong {
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+
+.budget-progress-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.budget-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.09);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.budget-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--text);
+}
+
+.budget-progress-card.over-budget .budget-bar-fill {
+  background: var(--danger);
+}
+
+.budget-progress-card.over-budget .budget-progress-head span {
+  color: var(--danger);
+}
+
+.budget-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 150px);
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.07);
+  padding: 12px;
+}
+
+.budget-input-row strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+
+.budget-input-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.budget-input-row input {
+  text-align: right;
+}
+
+.budget-currency-note {
+  margin-top: -4px;
+}
+
+@media (max-width: 370px) {
+  .budget-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-input-row input {
+    text-align: left;
+  }
+}
