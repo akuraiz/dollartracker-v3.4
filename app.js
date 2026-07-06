@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase5-budget-caps";
+const APP_VERSION = "3.4.0-phase6-categories-chart";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -18,6 +18,17 @@ const LEGACY_SETTINGS_KEYS = [
   "wifeyMoneySettings.liquid.v2"
 ];
 
+const DEFAULT_CATEGORY_DEFS = [
+  { id: "food", nameKey: "catFood", fallback: "Food" },
+  { id: "transfer", nameKey: "catTransfer", fallback: "Transfer" },
+  { id: "shopping", nameKey: "catShopping", fallback: "Shopping" },
+  { id: "transport", nameKey: "catTransport", fallback: "Transport" },
+  { id: "savings", nameKey: "catSavings", fallback: "Savings" },
+  { id: "other", nameKey: "catOther", fallback: "Other" }
+];
+
+const CATEGORY_KEYS = DEFAULT_CATEGORY_DEFS.map(category => category.id);
+
 const defaultSettings = {
   appName: "DollarTracker",
   language: "en",
@@ -27,6 +38,7 @@ const defaultSettings = {
   exchangeRate: 4000,
   lastBackupAt: "",
   backupReminderDismissedAt: "",
+  categories: [],
   categoryBudgets: {}
 };
 
@@ -35,7 +47,6 @@ const currencyPresets = {
   KHR: { symbol: "៛", decimals: 0, step: "1", placeholder: "8600", chips: [1000, 5000, 10000, 50000] }
 };
 
-const CATEGORY_KEYS = ["food", "transfer", "shopping", "transport", "savings", "other"];
 const QUICK_DESCRIPTION_KEYS = ["AC", "Food", "Coffee", "Transfer", "Shopping", "Transport"];
 
 const I18N = {
@@ -64,7 +75,7 @@ const I18N = {
     addedFallback:"Amount added", usedFallback:"Amount used", changedToEnglish:"Changed to English", changedToKhmer:"Changed to Khmer",
     edit:"Edit", editRecord:"Edit Record",
     editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None",
-    monthlyBudgets:"Monthly Budgets", monthlyBudgetsHint:"Track spending caps for this month.", categoryBudgets:"Category Budgets", categoryBudgetsHint:"Monthly caps per category. Stored internally in USD.", budgetCurrencyNote:"Shown in current display currency.", saveBudgets:"Save Budgets", budgetsSaved:"Budgets saved", noBudgetsSet:"No budgets set yet. Add caps in Settings.", budgetSpentLine:"{spent} of {budget}", budgetInputHint:"Leave 0 for no cap.", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
+    monthlyBudgets:"Monthly Budgets", monthlyBudgetsHint:"Track spending caps for this month.", categoryChart:"Category Breakdown", categoryChartHint:"This month’s spending by category.", noCategorySpending:"No category spending this month.", categoryManager:"Manage Categories", categoryManagerHint:"Add, rename, remove, or reset categories.", newCategoryPlaceholder:"New category name", addCategory:"Add", save:"Save", remove:"Remove", resetCategories:"Reset to Default", categoryExists:"Category already exists", categoryAdded:"Category added", categoryRenamed:"Category renamed", categoryRemoved:"Category removed", categoriesReset:"Categories reset", cannotRemoveOther:"Other cannot be removed", removeCategoryConfirm:"Remove this category? Existing records will move to Other.", resetCategoriesConfirm:"Reset categories to default? Custom categories will move to Other.", categoryBudgets:"Category Budgets", categoryBudgetsHint:"Monthly caps per category. Stored internally in USD.", budgetCurrencyNote:"Shown in current display currency.", saveBudgets:"Save Budgets", budgetsSaved:"Budgets saved", noBudgetsSet:"No budgets set yet. Add caps in Settings.", budgetSpentLine:"{spent} of {budget}", budgetInputHint:"Leave 0 for no cap.", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
   },
   km: {
     eyebrow:"បញ្ជីទឹកប្រាក់ឯកជន", home:"ទំព័រដើម", add:"បញ្ចូល", addRecord:"បញ្ចូលកំណត់ត្រា", history:"ប្រវត្តិ", backup:"បម្រុងទុក", settings:"ការកំណត់",
@@ -145,6 +156,83 @@ function uid() {
   return crypto?.randomUUID ? crypto.randomUUID() : `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
+
+function defaultCategoryList() {
+  return DEFAULT_CATEGORY_DEFS.map(category => ({
+    id: category.id,
+    name: category.fallback,
+    nameKey: category.nameKey,
+    isDefault: true
+  }));
+}
+
+function makeCategoryId(name) {
+  const base = String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 24) || `category-${Date.now()}`;
+  const taken = new Set(categoryKeys());
+  if (!taken.has(base)) return base;
+  let index = 2;
+  while (taken.has(`${base}-${index}`)) index += 1;
+  return `${base}-${index}`;
+}
+
+function normalizeCategoryList(input = []) {
+  const source = Array.isArray(input) && input.length ? input : defaultCategoryList();
+  const seen = new Set();
+  const output = [];
+
+  source.forEach(category => {
+    const id = String(category?.id || "").trim() || makeCategoryId(category?.name || "");
+    if (!id || seen.has(id)) return;
+    const defaultDef = DEFAULT_CATEGORY_DEFS.find(item => item.id === id);
+    const name = String(category?.name || defaultDef?.fallback || "").trim().slice(0, 28);
+    if (!name) return;
+    seen.add(id);
+    output.push({
+      id,
+      name,
+      nameKey: defaultDef && name === defaultDef.fallback ? defaultDef.nameKey : "",
+      isDefault: Boolean(defaultDef)
+    });
+  });
+
+  if (!output.some(category => category.id === "other")) {
+    const other = DEFAULT_CATEGORY_DEFS.find(category => category.id === "other");
+    output.push({ id: "other", name: other.fallback, nameKey: other.nameKey, isDefault: true });
+  }
+
+  return output.slice(0, 20);
+}
+
+function categoryDefs() {
+  return normalizeCategoryList(settings.categories);
+}
+
+function categoryKeys() {
+  return categoryDefs().map(category => category.id);
+}
+
+function categoryKey(category) {
+  return categoryKeys().includes(category) ? category : "other";
+}
+
+function resetCategoryRelatedData(allowedKeys = categoryKeys()) {
+  const allowed = new Set(allowedKeys);
+  records.forEach(record => {
+    if (!allowed.has(record.category)) record.category = "other";
+  });
+  const nextBudgets = {};
+  allowedKeys.forEach(key => {
+    const value = Number(settings.categoryBudgets?.[key] || 0);
+    nextBudgets[key] = Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : 0;
+  });
+  settings.categoryBudgets = nextBudgets;
+}
+
 function sanitizeSettings(input = {}) {
   const merged = { ...defaultSettings, ...input };
 
@@ -160,9 +248,10 @@ function sanitizeSettings(input = {}) {
   if (!["mono", "pink"].includes(merged.themeTemplate)) merged.themeTemplate = "mono";
   if (!merged.appName || merged.appName === "Wifey Money") merged.appName = "DollarTracker";
 
+  merged.categories = normalizeCategoryList(merged.categories);
   const rawBudgets = merged.categoryBudgets && typeof merged.categoryBudgets === "object" ? merged.categoryBudgets : {};
   merged.categoryBudgets = {};
-  CATEGORY_KEYS.forEach(key => {
+  merged.categories.map(category => category.id).forEach(key => {
     const value = Number(rawBudgets[key] || 0);
     merged.categoryBudgets[key] = Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : 0;
   });
@@ -249,8 +338,10 @@ function formatRecordOriginalMoney(record) {
 
 
 function categoryLabel(category) {
-  const key = CATEGORY_KEYS.includes(category) ? category : "other";
-  return tr(`cat${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+  const key = categoryKey(category);
+  const def = categoryDefs().find(item => item.id === key);
+  if (!def) return tr("catOther");
+  return def.nameKey ? tr(def.nameKey) : def.name;
 }
 
 function quickDescriptionLabel(value) {
@@ -259,8 +350,9 @@ function quickDescriptionLabel(value) {
 
 function renderCategoryOptions(select, selected = "other") {
   if (!select) return;
-  select.innerHTML = CATEGORY_KEYS.map(key => `<option value="${key}">${categoryLabel(key)}</option>`).join("");
-  select.value = CATEGORY_KEYS.includes(selected) ? selected : "other";
+  const keys = categoryKeys();
+  select.innerHTML = categoryDefs().map(category => `<option value="${category.id}">${escapeHTML(categoryLabel(category.id))}</option>`).join("");
+  select.value = keys.includes(selected) ? selected : "other";
 }
 
 function renderQuickDescriptionChips() {
@@ -281,15 +373,15 @@ function currentMonthRecords() {
 
 
 function budgetForCategoryUSD(category) {
-  const key = CATEGORY_KEYS.includes(category) ? category : "other";
+  const key = categoryKey(category);
   return Number(settings.categoryBudgets?.[key] || 0);
 }
 
 function monthlySpendingByCategory() {
   const spending = {};
-  CATEGORY_KEYS.forEach(key => { spending[key] = 0; });
+  categoryKeys().forEach(key => { spending[key] = 0; });
   currentMonthRecords().filter(record => record.type === "Out").forEach(record => {
-    const key = CATEGORY_KEYS.includes(record.category) ? record.category : "other";
+    const key = categoryKey(record.category);
     spending[key] += Number(record.amountUSD || 0);
   });
   return spending;
@@ -305,7 +397,7 @@ function renderBudgetSettings() {
   const container = $("#budgetInputList");
   if (!container) return;
   const info = currencyInfo(settings.displayCurrency);
-  container.innerHTML = CATEGORY_KEYS.map(key => {
+  container.innerHTML = categoryKeys().map(key => {
     const value = budgetDisplayInputValue(budgetForCategoryUSD(key));
     return `
       <label class="budget-input-row">
@@ -342,7 +434,7 @@ function renderBudgetProgress() {
   const container = $("#budgetProgressList");
   if (!container) return;
   const budgets = settings.categoryBudgets || {};
-  const activeKeys = CATEGORY_KEYS.filter(key => Number(budgets[key] || 0) > 0);
+  const activeKeys = categoryKeys().filter(key => Number(budgets[key] || 0) > 0);
   if (!activeKeys.length) {
     container.innerHTML = `<div class="empty-state">${tr("noBudgetsSet")}</div>`;
     return;
@@ -370,10 +462,141 @@ function renderBudgetProgress() {
   }).join("");
 }
 
+
+function renderCategoryManager() {
+  const container = $("#categoryManagerList");
+  if (!container) return;
+  container.innerHTML = categoryDefs().map(category => {
+    const locked = category.id === "other";
+    return `
+      <article class="category-manager-row ${locked ? "locked-other" : ""}">
+        <input type="text" maxlength="28" value="${escapeHTML(categoryLabel(category.id))}" data-category-name="${category.id}" aria-label="${escapeHTML(categoryLabel(category.id))}" ${locked ? "disabled" : ""} />
+        <button class="secondary-button compact-button" type="button" data-save-category="${category.id}" ${locked ? "disabled" : ""}>${tr("save")}</button>
+        <button class="ghost-button" type="button" data-remove-category="${category.id}" ${locked ? "disabled" : ""}>${tr("remove")}</button>
+      </article>
+    `;
+  }).join("");
+}
+
+function categoryNameExists(name, exceptId = "") {
+  const target = String(name || "").trim().toLowerCase();
+  if (!target) return false;
+  return categoryDefs().some(category => category.id !== exceptId && categoryLabel(category.id).trim().toLowerCase() === target);
+}
+
+function addCategory() {
+  const input = $("#newCategoryInput");
+  const name = String(input?.value || "").trim().slice(0, 28);
+  if (!name) return;
+  if (categoryNameExists(name)) {
+    showToast(tr("categoryExists"));
+    return;
+  }
+  const next = [...categoryDefs(), { id: makeCategoryId(name), name, nameKey: "", isDefault: false }];
+  settings.categories = normalizeCategoryList(next);
+  resetCategoryRelatedData(settings.categories.map(category => category.id));
+  saveSettings();
+  saveState();
+  if (input) input.value = "";
+  render({ translate: true });
+  showToast(tr("categoryAdded"));
+}
+
+function renameCategory(id) {
+  if (id === "other") {
+    showToast(tr("cannotRemoveOther"));
+    return;
+  }
+  const input = document.querySelector(`[data-category-name="${CSS.escape(id)}"]`);
+  const name = String(input?.value || "").trim().slice(0, 28);
+  if (!name) return;
+  if (categoryNameExists(name, id)) {
+    showToast(tr("categoryExists"));
+    return;
+  }
+  settings.categories = categoryDefs().map(category => category.id === id ? { ...category, name, nameKey: "" } : category);
+  saveSettings();
+  saveState();
+  render({ translate: true });
+  showToast(tr("categoryRenamed"));
+}
+
+function removeCategory(id) {
+  if (id === "other") {
+    showToast(tr("cannotRemoveOther"));
+    return;
+  }
+  if (!categoryKeys().includes(id)) return;
+  if (!confirm(tr("removeCategoryConfirm"))) return;
+  settings.categories = categoryDefs().filter(category => category.id !== id);
+  records.forEach(record => {
+    if (record.category === id) record.category = "other";
+  });
+  delete settings.categoryBudgets[id];
+  resetCategoryRelatedData(settings.categories.map(category => category.id));
+  saveRecords();
+  saveSettings();
+  saveState();
+  render({ translate: true });
+  showToast(tr("categoryRemoved"));
+}
+
+function resetCategories() {
+  if (!confirm(tr("resetCategoriesConfirm"))) return;
+  const defaults = defaultCategoryList();
+  const defaultKeys = defaults.map(category => category.id);
+  settings.categories = defaults;
+  records.forEach(record => {
+    if (!defaultKeys.includes(record.category)) record.category = "other";
+  });
+  const nextBudgets = {};
+  defaultKeys.forEach(key => {
+    const value = Number(settings.categoryBudgets?.[key] || 0);
+    nextBudgets[key] = Number.isFinite(value) && value > 0 ? value : 0;
+  });
+  settings.categoryBudgets = nextBudgets;
+  saveRecords();
+  saveSettings();
+  saveState();
+  render({ translate: true });
+  showToast(tr("categoriesReset"));
+}
+
+function categoryChartData() {
+  const spending = monthlySpendingByCategory();
+  return categoryKeys()
+    .map(key => ({ key, amount: Number(spending[key] || 0) }))
+    .filter(item => item.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+}
+
+function renderCategoryChart() {
+  const container = $("#categoryChartList");
+  if (!container) return;
+  const data = categoryChartData();
+  if (!data.length) {
+    container.innerHTML = `<div class="empty-state">${tr("noCategorySpending")}</div>`;
+    return;
+  }
+  const max = Math.max(...data.map(item => item.amount), 1);
+  container.innerHTML = data.map(item => {
+    const percent = Math.max(4, Math.round((item.amount / max) * 100));
+    return `
+      <article class="category-chart-card">
+        <div class="category-chart-head">
+          <strong>${escapeHTML(categoryLabel(item.key))}</strong>
+          <span>${formatMoneyFromUSD(item.amount)}</span>
+        </div>
+        <div class="category-chart-track"><i class="category-chart-fill" style="width:${percent}%"></i></div>
+      </article>
+    `;
+  }).join("");
+}
+
 function topCategoryFor(list) {
   const spending = new Map();
   list.filter(record => record.type === "Out").forEach(record => {
-    const category = CATEGORY_KEYS.includes(record.category) ? record.category : "other";
+    const category = categoryKey(record.category);
     spending.set(category, (spending.get(category) || 0) + Number(record.amountUSD || 0));
   });
   if (!spending.size) return tr("none");
@@ -442,7 +665,7 @@ function normalizeRecord(input) {
     originalAmount,
     originalCurrency: normalizedOriginalCurrency,
     exchangeRateAtEntry: Number(input.exchangeRateAtEntry || input.exchangeRate || rate || 4000),
-    category: CATEGORY_KEYS.includes(input.category) ? input.category : "other",
+    category: categoryKey(input.category),
     editHistory: Array.isArray(input.editHistory) ? input.editHistory : [],
     description: input.description || input.what || "",
     date: input.date || todayISO(),
@@ -674,7 +897,7 @@ function translateUI() {
   setText("localOnlyText", tr("localOnly")); setText("balanceLeftLabel", tr("balanceLeft")); setText("copyBalanceBtn", tr("copy"));
   setText("addOutText", tr("addOut")); setText("addInText", tr("addIn")); setText("moneyUsedText", tr("moneyUsed")); setText("moneyAddedText", tr("moneyAdded"));
   setText("totalInLabel", tr("totalIn")); setText("totalOutLabel", tr("totalOut")); setText("amountUsedLabel", tr("amountUsed"));
-  setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance")); setText("monthlyBudgetsTitle", tr("monthlyBudgets")); setText("monthlyBudgetsHint", tr("monthlyBudgetsHint"));
+  setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance")); setText("monthlyBudgetsTitle", tr("monthlyBudgets")); setText("monthlyBudgetsHint", tr("monthlyBudgetsHint")); setText("categoryChartTitle", tr("categoryChart")); setText("categoryChartHint", tr("categoryChartHint"));
   setText("recentTitle", tr("recent")); setText("latestMovementText", tr("latestMovement")); setText("viewAllBtn", tr("viewAll"));
   setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
   $("#descriptionInput").placeholder = tr("whatForPlaceholder"); $("#noteInput").placeholder = tr("optionalNote");
@@ -685,7 +908,7 @@ function translateUI() {
   setText("backupExportTitle", tr("backupExport")); setText("backupHintText", tr("backupHint")); setText("lastBackupLabel", tr("lastBackup")); setText("exportBackupBtn", tr("exportBackup")); setText("exportCsvBtn", tr("exportCsv")); setText("importBackupText", tr("importBackup")); setText("safetyHabitTitle", tr("safetyHabit")); setText("safetyHintText", tr("safetyHint"));
   setText("appearanceTitle", tr("appearance")); setText("displayModeLabel", tr("displayMode")); setText("darkLabel", tr("dark")); setText("lightLabel", tr("light")); setText("themeTemplateLabel", tr("themeTemplate")); setText("monoThemeText", tr("monoTheme")); setText("pinkThemeText", tr("pinkTheme"));
   setText("moneySettingsTitle", tr("moneySettings")); setText("exchangeRateTitle", tr("exchangeRate")); setText("exchangeRateHint", tr("exchangeRateHint")); setText("appNameTitle", tr("appName")); setText("appNameHint", tr("appNameHint")); setText("saveSettingsBtn", tr("saveSettings"));
-  setText("categoryBudgetsTitle", tr("categoryBudgets")); setText("categoryBudgetsHint", tr("categoryBudgetsHint")); setText("budgetCurrencyNote", tr("budgetCurrencyNote")); setText("saveBudgetsBtn", tr("saveBudgets"));
+  setText("categoryManagerTitle", tr("categoryManager")); setText("categoryManagerHint", tr("categoryManagerHint")); $("#newCategoryInput").placeholder = tr("newCategoryPlaceholder"); setText("addCategoryBtn", tr("addCategory")); setText("resetCategoriesBtn", tr("resetCategories")); setText("categoryBudgetsTitle", tr("categoryBudgets")); setText("categoryBudgetsHint", tr("categoryBudgetsHint")); setText("budgetCurrencyNote", tr("budgetCurrencyNote")); setText("saveBudgetsBtn", tr("saveBudgets"));
   setText("dangerZoneTitle", tr("dangerZone")); setText("dangerHintText", tr("dangerHint")); setText("clearDataBtn", Date.now() < clearArmedUntil ? tr("tapAgainClear") : tr("clearAll"));
   setText("editTitle", tr("editRecord")); setText("editHint", tr("editHint")); setText("closeEditBtn", tr("close"));
   setText("editTypeLabel", tr("type")); setText("editOutLabel", tr("out")); setText("editInLabel", tr("in"));
@@ -829,8 +1052,10 @@ function render(options = {}) {
   $$(".chip").forEach(button => button.classList.toggle("active", button.dataset.filter === activeFilter));
 
   renderAmountChips();
+  renderCategoryManager();
   renderBudgetSettings();
   renderBudgetProgress();
+  renderCategoryChart();
   renderRecordList($("#recentList"), sortedRecords(records).slice(0, 4), true);
   renderRecordList($("#historyList"), filteredRecords(), false);
   renderBackupReminder();
@@ -1499,6 +1724,23 @@ function initEvents() {
     showToast(tr("settingsSaved"));
   });
   $("#saveBudgetsBtn").addEventListener("click", saveCategoryBudgets);
+  $("#addCategoryBtn").addEventListener("click", addCategory);
+  $("#newCategoryInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addCategory();
+    }
+  });
+  $("#categoryManagerList").addEventListener("click", event => {
+    const saveButton = event.target.closest("[data-save-category]");
+    if (saveButton) {
+      renameCategory(saveButton.dataset.saveCategory);
+      return;
+    }
+    const removeButton = event.target.closest("[data-remove-category]");
+    if (removeButton) removeCategory(removeButton.dataset.removeCategory);
+  });
+  $("#resetCategoriesBtn").addEventListener("click", resetCategories);
   $("#clearDataBtn").addEventListener("click", clearEverything);
 
   window.addEventListener("pagehide", persistAll);
@@ -1511,7 +1753,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase5-budget-caps").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase6-categories-chart").then(reg => reg.update()).catch(() => {});
   }
 }
 

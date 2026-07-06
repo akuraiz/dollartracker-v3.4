@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4.0-phase5-budget-caps" />
+  <link rel="stylesheet" href="styles.css?v=3.4.0-phase6-categories-chart" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -112,6 +112,16 @@
             </div>
           </div>
           <div class="budget-list" id="budgetProgressList"></div>
+        </section>
+
+        <section class="panel glass category-chart-panel">
+          <div class="panel-head">
+            <div>
+              <h3 id="categoryChartTitle">Category Breakdown</h3>
+              <p class="hint" id="categoryChartHint">This month’s spending by category.</p>
+            </div>
+          </div>
+          <div class="category-chart-list" id="categoryChartList"></div>
         </section>
 
         <section class="panel glass">
@@ -239,6 +249,22 @@
             <input id="appNameInput" type="text" value="DollarTracker" />
           </label>
           <button class="secondary-button full" type="button" id="saveSettingsBtn">Save Settings</button>
+        </section>
+
+        <section class="panel glass category-manager-panel">
+          <div class="section-title">
+            <h3 id="categoryManagerTitle">Manage Categories</h3>
+            <p class="hint" id="categoryManagerHint">Add, rename, remove, or reset categories.</p>
+          </div>
+
+          <div class="category-add-row">
+            <input id="newCategoryInput" type="text" maxlength="28" placeholder="New category name" autocomplete="off" />
+            <button class="secondary-button compact-button" type="button" id="addCategoryBtn">Add</button>
+          </div>
+
+          <div class="category-manager-list" id="categoryManagerList"></div>
+
+          <button class="secondary-button full compact-button" type="button" id="resetCategoriesBtn">Reset to Default</button>
         </section>
 
         <section class="panel glass">
@@ -432,6 +458,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.4.0-phase5-budget-caps"></script>
+  <script src="app.js?v=3.4.0-phase6-categories-chart"></script>
 </body>
 </html>

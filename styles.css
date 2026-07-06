@@ -531,3 +531,100 @@ body.modal-open {
     text-align: left;
   }
 }
+
+
+/* v3.4 Phase 6: category manager + monthly category chart */
+.category-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.category-manager-list,
+.category-chart-list {
+  display: grid;
+  gap: 10px;
+}
+
+.category-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.07);
+  padding: 10px;
+}
+
+.category-manager-row input {
+  min-height: 46px;
+  border-radius: 16px;
+}
+
+.category-manager-row .ghost-button,
+.category-manager-row .secondary-button {
+  min-height: 46px;
+  padding: 10px 12px;
+}
+
+.category-manager-row.locked-other {
+  opacity: .82;
+}
+
+.category-chart-card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255,255,255,.07);
+  padding: 13px;
+}
+
+.category-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.category-chart-head strong {
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+
+.category-chart-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.category-chart-track {
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.09);
+  overflow: hidden;
+}
+
+.category-chart-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--text);
+}
+
+@media (max-width: 430px) {
+  .category-manager-row {
+    grid-template-columns: 1fr;
+  }
+
+  .category-add-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.category-chart-panel { overflow: hidden; }

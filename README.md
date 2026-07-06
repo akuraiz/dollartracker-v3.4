@@ -140,3 +140,15 @@ Phase 5: Category budget caps
 - KHR budget inputs use whole Riel display.
 - Home shows monthly budget progress using this month's Out records.
 - Built from Phase 4 after checking no PIN/security leftovers.
+
+
+## 3.4.0-phase6-categories-chart
+
+Phase 6: Manageable categories + monthly category breakdown
+- Categories can be added, renamed, removed, and reset to defaults.
+- Other is protected and cannot be removed.
+- Removing a category moves existing records in that category to Other.
+- Resetting categories restores default categories and moves custom-category records to Other.
+- Budgets follow the current category list.
+- Added This Month category breakdown bar chart.
+- Built from Phase 5 after checking no PIN/security leftovers.
