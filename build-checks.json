@@ -1,0 +1,58 @@
+{
+  "required_files_present": true,
+  "no_assets_folder": true,
+  "root_flags_present": true,
+  "no_assets_flag_refs": true,
+  "app_icon_png_files_present": true,
+  "manifest_uses_png_icons": true,
+  "index_uses_png_icon": true,
+  "pin_ui_removed": true,
+  "pin_logic_removed": true,
+  "old_v33_css_removed": true,
+  "old_pin_calc_css_removed": true,
+  "calculator_icon_button": true,
+  "calculator_not_open_by_default": true,
+  "calculator_clean_css": true,
+  "edit_still_present": true,
+  "clear_tap_twice_still_present": true,
+  "cache_bumped": true,
+  "version_bumped": true,
+  "js_syntax_ok": true,
+  "js_syntax_error": "",
+  "all_referenced_ids_exist": true,
+  "missing_referenced_ids": [],
+  "images_loadable": true,
+  "image_sizes": {
+    "flag-en.png": [
+      1220,
+      733
+    ],
+    "flag-kh.png": [
+      280,
+      180
+    ],
+    "icon.png": [
+      512,
+      512
+    ],
+    "apple-touch-icon.png": [
+      180,
+      180
+    ],
+    "icon-192.png": [
+      192,
+      192
+    ],
+    "icon-512.png": [
+      512,
+      512
+    ]
+  },
+  "icon_sizes_correct": true,
+  "logic_tests_ok": true,
+  "logic_test_output": "[[\"KHR whole\",true],[\"USD decimals\",true],[\"KHR entry rate\",true],[\"History no plus\",true],[\"History out minus\",true],[\"Home KHR display current rate\",true],[\"Home USD display\",true]]",
+  "logic_test_error": "",
+  "no_modal_show_on_load": true,
+  "all_checks_passed": true,
+  "zip_integrity_ok": true
+}
