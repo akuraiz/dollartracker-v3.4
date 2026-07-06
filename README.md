@@ -98,3 +98,13 @@ Final Phase 1 deepfix:
 - Kept calculator, but made the open button SVG icon-only.
 - Used the approved chrome dollar PNG icon for app icons.
 - Used user-provided root language flags.
+
+
+## 3.4.0-phase2-history-filter
+
+Phase 2: Cleaner History page
+- Search stays visible on History.
+- All/In/Out chips stay visible.
+- From date, To date, Sort, Clear Filters moved into a bottom sheet.
+- Added Filter button with active state when advanced filters are applied.
+- Confirmed no old PIN/security logic was present before building.

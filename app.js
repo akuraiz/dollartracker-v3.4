@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.4.0-phase1-deepfix-final";
+const APP_VERSION = "3.4.0-phase2-history-filter";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -45,7 +45,7 @@ const I18N = {
     whatFor:"Description", whatForPlaceholder:"Food, AC transfer, coffee...", date:"Date", note:"Note", optionalNote:"Optional note", saveRecord:"Save Record",
     remember:"Remember", rememberText:"<strong>Money received = In.</strong><br><strong>Money used or sent = Out.</strong><br>Never type minus signs.",
     allRecords:"All Records", historyHint:"Search, filter, and review your records.", summary:"Summary", all:"All", searchRecords:"Search records...",
-    fromDate:"From", toDate:"To", newest:"Newest first", oldest:"Oldest first", highest:"Highest amount", lowest:"Lowest amount", clearFilters:"Clear Filters",
+    fromDate:"From", toDate:"To", newest:"Newest first", oldest:"Oldest first", highest:"Highest amount", lowest:"Lowest amount", clearFilters:"Clear Filters", filter:"Filter", filterRecords:"Filter Records", filterHint:"Narrow records by date or sorting.", sortBy:"Sort by", applyFilters:"Apply Filters",
     backupExport:"Backup & Export", backupHint:"Your records stay in this browser. Export backup regularly.", lastBackup:"Last backup", never:"Never",
     exportBackup:"Export Backup JSON", exportCsv:"Export CSV", importBackup:"Import Backup JSON", safetyHabit:"Safety habit",
     safetyHint:"After adding records, export a backup and save it to iCloud Drive or Google Drive.", appearance:"Appearance", displayMode:"Display Mode",
@@ -59,10 +59,8 @@ const I18N = {
     cleared:"All records cleared", deleteConfirm:"Delete this record?", noDescription:"No description",
     importConfirm:"Import backup? This will replace current records in this browser.", importError:"Could not import backup. Make sure it is the correct JSON file.",
     addedFallback:"Amount added", usedFallback:"Amount used", changedToEnglish:"Changed to English", changedToKhmer:"Changed to Khmer",
-    security:"Security", securityHint:"Simple PIN protects edit, delete, and clear actions. Face ID is skipped for stability.", actionPin:"Action PIN",
-    pinSet:"PIN is set", pinNotSet:"PIN not set", savePin:"Save PIN", removePin:"Remove PIN", pinSaved:"PIN saved", pinRemoved:"PIN removed",
-    invalidPin:"Use 4-6 digits", enterPin:"Enter PIN", wrongPin:"Wrong PIN", edit:"Edit", editRecord:"Edit Record",
-    editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", pinHasSet:"PIN has been set", pinSetHint:"Protected actions will ask for your PIN.", editHistory:"Edit History", noEdits:"No edits yet", editedOn:"Edited on {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"Type", fieldAmount:"Amount", fieldCategory:"Category", fieldDescription:"Description", fieldDate:"Date", fieldNote:"Note", choosePinLength:"Choose PIN Length", setPin:"Set PIN", fourPin:"4 PIN", sixPin:"6 PIN", lockNow:"Lock Now", locked:"Locked", unlockedFor:"Unlocked for {minutes} min", createPin:"Create PIN", confirmPin:"Confirm PIN", enterPinTitle:"Enter PIN", pinSetupHint:"Use the number pad. No letters keyboard.", pinConfirmHint:"Enter the same PIN again.", pinMismatch:"PIN did not match", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
+    edit:"Edit", editRecord:"Edit Record",
+    editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport"
   },
   km: {
     eyebrow:"បញ្ជីទឹកប្រាក់ឯកជន", home:"ទំព័រដើម", add:"បញ្ចូល", addRecord:"បញ្ចូលកំណត់ត្រា", history:"ប្រវត្តិ", backup:"បម្រុងទុក", settings:"ការកំណត់",
@@ -75,7 +73,7 @@ const I18N = {
     rememberText:"<strong>ទឹកប្រាក់បានទទួល = ចូល</strong><br><strong>ទឹកប្រាក់បានប្រើ ឬ ផ្ញើចេញ = ចេញ</strong><br>កុំវាយសញ្ញាដក (-)។",
     allRecords:"កំណត់ត្រាទាំងអស់", historyHint:"ស្វែងរក តម្រៀប និងពិនិត្យកំណត់ត្រារបស់អ្នក។", summary:"សង្ខេប", all:"ទាំងអស់",
     searchRecords:"ស្វែងរកកំណត់ត្រា...", fromDate:"ពីថ្ងៃ", toDate:"ដល់ថ្ងៃ", newest:"ថ្មីបំផុត", oldest:"ចាស់បំផុត",
-    highest:"ចំនួនច្រើនបំផុត", lowest:"ចំនួនតិចបំផុត", clearFilters:"លុបតម្រង", backupExport:"បម្រុងទុក និងនាំចេញ",
+    highest:"ចំនួនច្រើនបំផុត", lowest:"ចំនួនតិចបំផុត", clearFilters:"លុបតម្រង", filter:"តម្រង", filterRecords:"តម្រងកំណត់ត្រា", filterHint:"កំណត់តាមកាលបរិច្ឆេទ ឬការតម្រៀប។", sortBy:"តម្រៀបតាម", applyFilters:"អនុវត្តតម្រង", backupExport:"បម្រុងទុក និងនាំចេញ",
     backupHint:"កំណត់ត្រាត្រូវបានរក្សាទុកក្នុង Browser នេះ។ សូមនាំចេញ Backup ជាប្រចាំ។", lastBackup:"បម្រុងទុកចុងក្រោយ",
     never:"មិនទាន់មាន", exportBackup:"នាំចេញ Backup JSON", exportCsv:"នាំចេញ CSV", importBackup:"នាំចូល Backup JSON",
     safetyHabit:"ទម្លាប់សុវត្ថិភាព", safetyHint:"បន្ទាប់ពីបញ្ចូលកំណត់ត្រា សូមនាំចេញ Backup ហើយរក្សាទុកក្នុង iCloud Drive ឬ Google Drive។",
@@ -90,10 +88,8 @@ const I18N = {
     settingsSaved:"បានរក្សាទុកការកំណត់", cleared:"បានលុបកំណត់ត្រាទាំងអស់", deleteConfirm:"តើចង់លុបកំណត់ត្រានេះមែនទេ?", noDescription:"គ្មានការពិពណ៌នា",
     importConfirm:"នាំចូល Backup? វានឹងជំនួសកំណត់ត្រាបច្ចុប្បន្នក្នុង Browser នេះ។", importError:"មិនអាចនាំចូល Backup បានទេ។ សូមពិនិត្យថា វាជាឯកសារ JSON ត្រឹមត្រូវ។",
     addedFallback:"ទឹកប្រាក់បានបន្ថែម", usedFallback:"ទឹកប្រាក់បានប្រើ", changedToEnglish:"បានប្តូរទៅភាសាអង់គ្លេស", changedToKhmer:"បានប្តូរទៅភាសាខ្មែរ",
-    security:"សុវត្ថិភាព", securityHint:"PIN សាមញ្ញការពារការកែប្រែ ការលុប និងការលុបទាំងអស់។ មិនបញ្ចូល Face ID ដើម្បីរក្សាស្ថេរភាព។", actionPin:"PIN សម្រាប់សកម្មភាព",
-    pinSet:"បានកំណត់ PIN", pinNotSet:"មិនទាន់កំណត់ PIN", savePin:"រក្សាទុក PIN", removePin:"លុប PIN", pinSaved:"បានរក្សាទុក PIN", pinRemoved:"បានលុប PIN",
-    invalidPin:"ប្រើលេខ ៤-៦ ខ្ទង់", enterPin:"បញ្ចូល PIN", wrongPin:"PIN មិនត្រឹមត្រូវ", edit:"កែ", editRecord:"កែប្រែកំណត់ត្រា",
-    editHint:"ចំនួនទឹកប្រាក់ក្នុងប្រវត្តិនឹងនៅដដែល លុះត្រាតែអ្នកកែប្រែកំណត់ត្រានេះ។", currency:"រូបិយប័ណ្ណ", saveChanges:"រក្សាទុកការកែប្រែ", recordUpdated:"បានកែប្រែកំណត់ត្រា", category:"ប្រភេទ", thisMonth:"ខែនេះ", monthlyHint:"សង្ខេបប្រចាំខែ", balance:"សមតុល្យ", topCategory:"ប្រភេទប្រើច្រើនបំផុត៖ {category}", none:"គ្មាន", quickAC:"AC", quickAC:"AC", quickFood:"អាហារ", quickCoffee:"កាហ្វេ", quickTransfer:"ផ្ទេរ", quickShopping:"ទិញឥវ៉ាន់", catFood:"អាហារ", catTransfer:"ផ្ទេរ", catShopping:"ទិញឥវ៉ាន់", catTransport:"ធ្វើដំណើរ", catSavings:"សន្សំ", catOther:"ផ្សេងៗ", pinHasSet:"បានកំណត់ PIN រួចហើយ", pinSetHint:"សកម្មភាពដែលការពារ នឹងស្នើសុំ PIN។", editHistory:"ប្រវត្តិកែប្រែ", noEdits:"មិនទាន់មានការកែប្រែ", editedOn:"បានកែប្រែនៅ {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"ប្រភេទ", fieldAmount:"ចំនួនទឹកប្រាក់", fieldCategory:"ប្រភេទ", fieldDescription:"ការពិពណ៌នា", fieldDate:"កាលបរិច្ឆេទ", fieldNote:"ចំណាំ", choosePinLength:"ជ្រើសប្រវែង PIN", setPin:"កំណត់ PIN", fourPin:"PIN ៤ ខ្ទង់", sixPin:"PIN ៦ ខ្ទង់", lockNow:"ចាក់សោឥឡូវ", locked:"បានចាក់សោ", unlockedFor:"បានដោះសោ {minutes} នាទី", createPin:"បង្កើត PIN", confirmPin:"បញ្ជាក់ PIN", enterPinTitle:"បញ្ចូល PIN", pinSetupHint:"ប្រើបន្ទះលេខ។ មិនប្រើ Keyboard អក្សរ។", pinConfirmHint:"បញ្ចូល PIN ដូចគ្នាម្ដងទៀត។", pinMismatch:"PIN មិនដូចគ្នា", calculator:"ម៉ាស៊ីនគិតលេខ", calculatorHint:"គណនា ហើយយកទៅប្រើជាចំនួនទឹកប្រាក់។", useAmount:"ប្រើចំនួននេះ", khrWholeOnly:"KHR ប្រើតែចំនួនរៀលពេញ", quickTransport:"ធ្វើដំណើរ"
+    edit:"កែ", editRecord:"កែប្រែកំណត់ត្រា",
+    editHint:"ចំនួនទឹកប្រាក់ក្នុងប្រវត្តិនឹងនៅដដែល លុះត្រាតែអ្នកកែប្រែកំណត់ត្រានេះ។", currency:"រូបិយប័ណ្ណ", saveChanges:"រក្សាទុកការកែប្រែ", recordUpdated:"បានកែប្រែកំណត់ត្រា", category:"ប្រភេទ", thisMonth:"ខែនេះ", monthlyHint:"សង្ខេបប្រចាំខែ", balance:"សមតុល្យ", topCategory:"ប្រភេទប្រើច្រើនបំផុត៖ {category}", none:"គ្មាន", quickAC:"AC", quickAC:"AC", quickFood:"អាហារ", quickCoffee:"កាហ្វេ", quickTransfer:"ផ្ទេរ", quickShopping:"ទិញឥវ៉ាន់", catFood:"អាហារ", catTransfer:"ផ្ទេរ", catShopping:"ទិញឥវ៉ាន់", catTransport:"ធ្វើដំណើរ", catSavings:"សន្សំ", catOther:"ផ្សេងៗ", calculator:"ម៉ាស៊ីនគិតលេខ", calculatorHint:"គណនា ហើយយកទៅប្រើជាចំនួនទឹកប្រាក់។", useAmount:"ប្រើចំនួននេះ", khrWholeOnly:"KHR ប្រើតែចំនួនរៀលពេញ", quickTransport:"ធ្វើដំណើរ"
   }
 };
 
@@ -565,7 +561,7 @@ function translateUI() {
   setText("recentTitle", tr("recent")); setText("latestMovementText", tr("latestMovement")); setText("viewAllBtn", tr("viewAll"));
   setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
   $("#descriptionInput").placeholder = tr("whatForPlaceholder"); $("#noteInput").placeholder = tr("optionalNote");
-  setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("clearFiltersBtn", tr("clearFilters"));
+  setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("openFilterText", tr("filter")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("historyFilterTitle", tr("filterRecords")); setText("historyFilterHint", tr("filterHint")); setText("closeHistoryFilterBtn", tr("close")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("sortByLabel", tr("sortBy")); setText("clearFiltersBtn", tr("clearFilters")); setText("applyHistoryFilterBtn", tr("applyFilters"));
   $("#searchInput").placeholder = tr("searchRecords");
   const sort = $("#sortSelect"); if (sort) { sort.options[0].text = tr("newest"); sort.options[1].text = tr("oldest"); sort.options[2].text = tr("highest"); sort.options[3].text = tr("lowest"); }
   setText("backupExportTitle", tr("backupExport")); setText("backupHintText", tr("backupHint")); setText("lastBackupLabel", tr("lastBackup")); setText("exportBackupBtn", tr("exportBackup")); setText("exportCsvBtn", tr("exportCsv")); setText("importBackupText", tr("importBackup")); setText("safetyHabitTitle", tr("safetyHabit")); setText("safetyHintText", tr("safetyHint"));
@@ -706,6 +702,7 @@ function render() {
   $("#fromDateInput").value = fromDate;
   $("#toDateInput").value = toDate;
   $("#searchInput").value = searchTerm;
+  updateHistoryFilterButton();
 
   $$(".currency-card-btn").forEach(button => button.classList.toggle("active", button.dataset.currency === settings.displayCurrency));
   $$("[data-template-choice]").forEach(button => button.classList.toggle("active", button.dataset.templateChoice === settings.themeTemplate));
@@ -1109,6 +1106,33 @@ function importBackup(file) {
     reader.readAsText(file);
 }
 
+
+function historyAdvancedFiltersActive() {
+  return Boolean(fromDate || toDate || sortMode !== "newest");
+}
+
+function updateHistoryFilterButton() {
+  const button = $("#openHistoryFilterBtn");
+  if (!button) return;
+  button.classList.toggle("active", historyAdvancedFiltersActive());
+}
+
+function openHistoryFilter() {
+  $("#historyFilterBackdrop").classList.add("show");
+  document.body.classList.add("modal-open");
+}
+
+function closeHistoryFilter() {
+  $("#historyFilterBackdrop").classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+
+function applyHistoryFilter() {
+  saveState();
+  render();
+  closeHistoryFilter();
+}
+
 function clearFilters() {
   activeFilter = "All";
   searchTerm = "";
@@ -1117,6 +1141,7 @@ function clearFilters() {
   sortMode = "newest";
   saveState();
   render();
+  closeHistoryFilter();
 }
 
 function clearEverything() {
@@ -1235,6 +1260,12 @@ function initEvents() {
   $("#toDateInput").addEventListener("change", event => { toDate = event.target.value; saveState(); render(); });
   $("#sortSelect").addEventListener("change", event => { sortMode = event.target.value; saveState(); render(); });
   $("#clearFiltersBtn").addEventListener("click", clearFilters);
+  $("#openHistoryFilterBtn").addEventListener("click", openHistoryFilter);
+  $("#closeHistoryFilterBtn").addEventListener("click", closeHistoryFilter);
+  $("#applyHistoryFilterBtn").addEventListener("click", applyHistoryFilter);
+  $("#historyFilterBackdrop").addEventListener("click", event => {
+    if (event.target.id === "historyFilterBackdrop") closeHistoryFilter();
+  });
 
   $("#summaryBtn").addEventListener("click", () => { renderSummary(); $("#summaryBackdrop").classList.add("show"); });
   $("#closeSummaryBtn").addEventListener("click", () => $("#summaryBackdrop").classList.remove("show"));
@@ -1318,7 +1349,7 @@ function initEvents() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase1-deepfix-final").then(reg => reg.update()).catch(() => {});
+    navigator.serviceWorker.register("./service-worker.js?v=3.4.0-phase2-history-filter").then(reg => reg.update()).catch(() => {});
   }
 }
 

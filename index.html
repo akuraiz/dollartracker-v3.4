@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4.0-phase1-deepfix-final" />
+  <link rel="stylesheet" href="styles.css?v=3.4.0-phase2-history-filter" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -152,25 +152,22 @@
             <button class="ghost-button" type="button" id="summaryBtn">Summary</button>
           </div>
 
+          <div class="history-tools history-tools-clean">
+            <input id="searchInput" type="search" placeholder="Search records..." />
+            <button class="history-filter-btn" type="button" id="openHistoryFilterBtn" aria-label="Filter records">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16"></path>
+                <path d="M7 12h10"></path>
+                <path d="M10 18h4"></path>
+              </svg>
+              <span id="openFilterText">Filter</span>
+            </button>
+          </div>
+
           <div class="filter-row">
             <button class="chip active" type="button" data-filter="All" id="filterAll">All</button>
             <button class="chip" type="button" data-filter="In" id="filterIn">In</button>
             <button class="chip" type="button" data-filter="Out" id="filterOut">Out</button>
-          </div>
-
-          <div class="history-tools">
-            <input id="searchInput" type="search" placeholder="Search records..." />
-            <div class="date-row">
-              <label><span id="fromDateLabel">From</span><input id="fromDateInput" type="date" /></label>
-              <label><span id="toDateLabel">To</span><input id="toDateInput" type="date" /></label>
-            </div>
-            <select id="sortSelect">
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-              <option value="high">Highest amount</option>
-              <option value="low">Lowest amount</option>
-            </select>
-            <button class="secondary-button full compact-button" type="button" id="clearFiltersBtn">Clear Filters</button>
           </div>
 
           <div class="record-list" id="historyList"></div>
@@ -249,6 +246,40 @@
         <div class="graph-card">
           <div class="graph-row"><span id="summaryInGraphLabel">Total In</span><div class="bar-track"><i id="summaryInBar"></i></div></div>
           <div class="graph-row"><span id="summaryOutGraphLabel">Total Out</span><div class="bar-track"><i id="summaryOutBar"></i></div></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="filter-sheet-backdrop" id="historyFilterBackdrop">
+      <section class="filter-sheet glass-strong" role="dialog" aria-modal="true">
+        <div class="panel-head">
+          <div>
+            <h3 id="historyFilterTitle">Filter Records</h3>
+            <p class="hint" id="historyFilterHint">Narrow records by date or sorting.</p>
+          </div>
+          <button class="ghost-button" type="button" id="closeHistoryFilterBtn">Close</button>
+        </div>
+
+        <div class="filter-sheet-form">
+          <div class="date-row">
+            <label><span id="fromDateLabel">From</span><input id="fromDateInput" type="date" /></label>
+            <label><span id="toDateLabel">To</span><input id="toDateInput" type="date" /></label>
+          </div>
+
+          <label>
+            <span id="sortByLabel">Sort by</span>
+            <select id="sortSelect">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="high">Highest amount</option>
+              <option value="low">Lowest amount</option>
+            </select>
+          </label>
+
+          <div class="filter-sheet-actions">
+            <button class="secondary-button compact-button" type="button" id="clearFiltersBtn">Clear Filters</button>
+            <button class="primary-button compact-button" type="button" id="applyHistoryFilterBtn">Apply Filters</button>
+          </div>
         </div>
       </section>
     </div>
@@ -363,6 +394,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.4.0-phase1-deepfix-final"></script>
+  <script src="app.js?v=3.4.0-phase2-history-filter"></script>
 </body>
 </html>

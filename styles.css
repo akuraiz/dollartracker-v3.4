@@ -280,3 +280,101 @@ body.modal-open {
     padding: 14px;
   }
 }
+
+
+/* v3.4 Phase 2: clean History filters */
+.history-tools-clean {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.history-filter-btn {
+  min-height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255,255,255,.10);
+  color: var(--text);
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.history-filter-btn svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+
+.history-filter-btn.active {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.filter-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 66;
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0,0,0,.36);
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+.filter-sheet-backdrop.show {
+  display: flex;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.filter-sheet {
+  display: block;
+  width: min(100%, 448px);
+  max-height: min(82svh, 680px);
+  overflow-y: auto;
+  border-radius: 30px;
+  padding: 18px;
+  margin: 0;
+  animation: sheetIn .22s ease both;
+}
+
+.filter-sheet-form {
+  display: grid;
+  gap: 14px;
+}
+
+.filter-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 370px) {
+  .history-tools-clean {
+    grid-template-columns: 1fr;
+  }
+
+  .history-filter-btn {
+    width: 100%;
+  }
+
+  .filter-sheet-actions {
+    grid-template-columns: 1fr;
+  }
+}
